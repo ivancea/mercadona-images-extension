@@ -47,25 +47,17 @@ async function updateHtml(window, document) {
 
   document.body.appendChild(document.createElement("style")).textContent = `
     .gridContainer {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       align-items: center;
-      justify-content: space-between;
       border: 10px solid #ffffcc;
     }
 
-    .gridContainer::after {
-      content: "";
-      flex: auto;
-    }
-
     .gridContainer > .articleContainer {
-      width: 200px;
       align-self: stretch;
-      flex-grow: 1;
       display: flex;
       flex-direction: column;
+      gap: 5px;
       border: 5px solid #ccccaa;
     }
 
@@ -77,11 +69,25 @@ async function updateHtml(window, document) {
       text-align: center
     }
 
+    .gridContainer > .articleContainer > .imageContainer {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
     .gridContainer > .articleContainer > .imageContainer > img {
       width: 100%;
       object-fit: contain;
     }
 
+    .gridContainer > .articleContainer > .actionsContainer {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
   `;
 
   const rows = [...table.querySelectorAll("tbody tr")];
@@ -136,7 +142,9 @@ function makeArticleElement(article) {
     detailsLink.textContent = "Detalles";
     actionsContainer.append(detailsLink);
   }
-  actionsContainer.append(...article.quantitySelectorElements);
+  const quantitySelectorElement = document.createElement("span");
+  quantitySelectorElement.append(...article.quantitySelectorElements);
+  actionsContainer.append(quantitySelectorElement);
   actionsContainer.append(article.addToCartButton);
   articleContainer.append(actionsContainer);
 
