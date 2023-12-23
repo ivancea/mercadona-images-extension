@@ -50,7 +50,6 @@ async function updateHtml(window, document) {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       align-items: center;
-      border: 10px solid #ffffcc;
     }
 
     .gridContainer > .articleContainer {
@@ -201,19 +200,30 @@ async function getArticleFromRow(row) {
 }
 
 async function getArticleData(articleId) {
+  const url = `https://tienda.mercadona.es/api/products/${articleId}/?lang=es&wh=mad1`;
+
   return new Promise((resolve, reject) => {
     GM_xmlhttpRequest({
       method: "GET",
-      url: `https://tienda.mercadona.es/api/products/${articleId}/?lang=es&wh=mad1`,
+      url,
       onload: function (response) {
         try {
-          resolve(JSON.parse(response.responseText));
+          const json = JSON.parse(response.responseText);
+
+          if (json.errors) {
+            reject({
+              description: `Errors found in response from ${url}`,
+              error: json,
+            });
+          } else {
+            resolve(json);
+          }
         } catch (error) {
-          reject(error);
+          reject({ description: `Error parsing JSON from ${url}`, error });
         }
       },
       onerror: function (error) {
-        reject(error);
+        reject({ description: `Error fetching ${url}`, error });
       },
     });
   });
