@@ -48,7 +48,7 @@ async function updateHtml(window, document) {
   document.body.appendChild(document.createElement("style")).textContent = `
     .gridContainer {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       align-items: center;
     }
 
