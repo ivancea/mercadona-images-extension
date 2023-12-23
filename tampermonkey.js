@@ -30,7 +30,7 @@
         mainFrameWindow.launchScript((window) => {
           updateHtml(window, window.document);
         });
-      }, 2000);
+      }, 500);
     },
     false
   );
@@ -39,61 +39,146 @@
 async function updateHtml(window, document) {
   const table = document.getElementById("TaulaLlista");
 
-  if (!table || table.dataset.filledWithImages === "true") {
+  if (!table || table.dataset.processed === "true") {
     return;
   }
 
-  table.dataset.filledWithImages = "true";
+  table.dataset.processed = "true";
 
   document.body.appendChild(document.createElement("style")).textContent = `
-    img.articleImage {
-      object-fit: contain;
-      width: 40px;
-      height: 40px;
-      float: left;
-      transition: transform .2s;
-      transform-origin: left center;
+    .gridContainer {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border: 10px solid #ffffcc;
     }
 
-    img.articleImage:hover {
-      transform: scale(10);
-      z-index: 9999;
+    .gridContainer::after {
+      content: "";
+      flex: auto;
     }
+
+    .gridContainer > .articleContainer {
+      width: 200px;
+      align-self: stretch;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      border: 5px solid #ccccaa;
+    }
+
+    .gridContainer > .articleContainer:nth-child(odd) {
+      background-color: #ffffcc;
+    }
+
+    .gridContainer > .articleContainer > div {
+      text-align: center
+    }
+
+    .gridContainer > .articleContainer > .imageContainer > img {
+      width: 100%;
+      object-fit: contain;
+    }
+
   `;
 
   const rows = [...table.querySelectorAll("tbody tr")];
 
-  await Promise.all(
-    rows.map(async (row) => {
-      const articleCell = row.querySelector("[headers=header1]");
-      const addToCartImage = row.querySelector("[headers=header4] > img");
-
-      const match = /incluir\(\d*,event,'\d*','(\d*)'/.exec(
-        addToCartImage.onclick
-      );
-
-      if (!match) {
-        return;
-      }
-
-      const articleId = match[1];
-
-      const articleData = await getArticleData(articleId);
-      const photoUrl = articleData?.photos?.[0]?.regular;
-
-      if (photoUrl) {
-        const image = document.createElement("img");
-
-        image.src = photoUrl;
-        image.classList.add("articleImage");
-        image.onerror = () => {
-          image.style.display = "none";
-        };
-
-        articleCell.prepend(image);
-      }
-    })
+  const articles = await Promise.all(
+    rows.map(async (row) => await getArticleFromRow(row))
   );
+
+  const container = document.createElement("div");
+  container.classList.add("gridContainer");
+
+  for (const article of articles) {
+    container.append(makeArticleElement(article));
+  }
+
+  table.parentNode.append(container);
+  table.style.display = "none";
+}
+
+function makeArticleElement(article) {
+  const articleContainer = document.createElement("div");
+  articleContainer.classList.add("articleContainer");
+
+  const textContainer = document.createElement("div");
+  textContainer.classList.add("textContainer");
+  textContainer.textContent = article.name;
+  articleContainer.append(textContainer);
+
+  const photoUrl = article.data?.photos?.[0]?.regular;
+  if (photoUrl) {
+    const imageContainer = document.createElement("div");
+    imageContainer.classList.add("imageContainer");
+    const image = document.createElement("img");
+    image.src = photoUrl;
+    image.onerror = () => {
+      imageContainer.remove();
+    };
+    imageContainer.append(image);
+    articleContainer.append(imageContainer);
+  }
+
+  const priceContainer = document.createElement("div");
+  priceContainer.classList.add("priceContainer");
+  priceContainer.textContent = article.prices?.join(" / ");
+  articleContainer.append(priceContainer);
+
+  const actionsContainer = document.createElement("div");
+  actionsContainer.classList.add("actionsContainer");
+  if (article.detailsHref) {
+    const detailsLink = document.createElement("a");
+    detailsLink.href = article.detailsHref;
+    detailsLink.textContent = "Detalles";
+    actionsContainer.append(detailsLink);
+  }
+  actionsContainer.append(...article.quantitySelectorElements);
+  actionsContainer.append(article.addToCartButton);
+  articleContainer.append(actionsContainer);
+
+  return articleContainer;
+}
+
+async function getArticleFromRow(row) {
+  const articleName = row.querySelector(
+    "[headers=header1] > span"
+  )?.textContent;
+  const [detailsHeader, priceHeaders] =
+    row.querySelectorAll("[headers=header2]");
+  const articleDetailsHref = detailsHeader.querySelector("span > a")?.href;
+  const articlePrices = [...priceHeaders.querySelectorAll("span")].map(
+    (span) => span.textContent
+  );
+  const articleQuantitySelectorElements = row.querySelectorAll(
+    "[headers=header3] > *"
+  );
+  const articleAddToCartButton = row.querySelector("[headers=header4] > img");
+
+  const match = /incluir\(\d*,event,'\d*','(\d*)'/.exec(
+    articleAddToCartButton.onclick
+  );
+
+  if (!match) {
+    return undefined;
+  }
+
+  const articleId = match[1];
+
+  const articleData = await getArticleData(articleId);
+
+  return {
+    id: articleId,
+    name: articleName,
+    detailsHref: articleDetailsHref,
+    prices: articlePrices,
+    quantitySelectorElements: articleQuantitySelectorElements,
+    addToCartButton: articleAddToCartButton,
+    data: articleData,
+  };
 }
 
 async function getArticleData(articleId) {
