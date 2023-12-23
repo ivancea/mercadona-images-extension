@@ -18,4 +18,4 @@ It also re-styles the page by changing the table to a grid style.
 
 Now, while searching the products, you should see a grid instead of the table.
 
-Note: It may take some tim (Less than a second with a good connection) for the new grid to appear.
+Note: It may take some time (Less than a second) for the new grid to appear. If it doesn't, try reloading the page, checking the instructions again, or opening an issue.

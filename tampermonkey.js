@@ -73,6 +73,7 @@ async function updateHtml(window, document) {
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
+      min-height: 250px;
     }
 
     .gridContainer > .articleContainer > .imageContainer > img {
@@ -124,18 +125,22 @@ function makeArticleElement(article) {
   textContainer.textContent = article.name;
   articleContainer.append(textContainer);
 
-  const photoUrl = article.data?.photos?.[0]?.regular;
-  if (photoUrl) {
-    const imageContainer = document.createElement("div");
-    imageContainer.classList.add("imageContainer");
-    const image = document.createElement("img");
-    image.src = photoUrl;
-    image.onerror = () => {
-      imageContainer.remove();
-    };
-    imageContainer.append(image);
-    articleContainer.append(imageContainer);
-  }
+  const imageContainer = document.createElement("div");
+  imageContainer.classList.add("imageContainer");
+  articleContainer.append(imageContainer);
+
+  article.dataPromise?.then((data) => {
+    const photoUrl = data?.photos?.[0]?.regular;
+
+    if (photoUrl) {
+      const image = document.createElement("img");
+      image.src = photoUrl;
+      image.onerror = () => {
+        imageContainer.remove();
+      };
+      imageContainer.append(image);
+    }
+  });
 
   const priceContainer = document.createElement("div");
   priceContainer.classList.add("priceContainer");
@@ -184,7 +189,7 @@ async function getArticleFromRow(row) {
 
   const articleId = match[1];
 
-  const articleData = await getArticleData(articleId).catch((error) => {
+  const articleDataPromise = getArticleData(articleId).catch((error) => {
     console.warn(`Failed fetching article ${articleId} data `, error);
   });
 
@@ -195,7 +200,7 @@ async function getArticleFromRow(row) {
     prices: articlePrices,
     quantitySelectorElements: articleQuantitySelectorElements,
     addToCartButton: articleAddToCartButton,
-    data: articleData,
+    dataPromise: articleDataPromise,
   };
 }
 
