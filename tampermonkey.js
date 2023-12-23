@@ -48,15 +48,15 @@ function updateHtml(window, document) {
   document.body.appendChild(document.createElement("style")).textContent = `
     img.articleImage {
       object-fit: contain;
-      width: 24px;
-      height: 24px;
+      width: 40px;
+      height: 40px;
       float: left;
       transition: transform .2s;
       transform-origin: left center;
     }
 
     img.articleImage:hover {
-      transform: scale(20);
+      transform: scale(10);
       z-index: 9999;
     }
   `;
@@ -81,7 +81,9 @@ function updateHtml(window, document) {
 
     image.src = `https://raw.githubusercontent.com/ivancea/mercadona-images-extension/master/product-images/${articleId}.jpg`;
     image.classList.add("articleImage");
-    image.onerror = () => (image.style.display = "none");
+    image.onerror = () => {
+      image.style.display = "none";
+    };
 
     articleCell.prepend(image);
   });
