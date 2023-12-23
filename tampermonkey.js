@@ -6,7 +6,7 @@
 // @author       Iván Cea Fontenla
 // @match        https://www.telecompra.mercadona.es/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mercadona.es
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 (function () {
@@ -36,7 +36,7 @@
   );
 })();
 
-function updateHtml(window, document) {
+async function updateHtml(window, document) {
   const table = document.getElementById("TaulaLlista");
 
   if (!table || table.dataset.filledWithImages === "true") {
@@ -61,30 +61,56 @@ function updateHtml(window, document) {
     }
   `;
 
-  const rows = table.querySelectorAll("tbody tr");
+  const rows = [...table.querySelectorAll("tbody tr")];
 
-  rows.forEach((row) => {
-    const articleCell = row.querySelector("[headers=header1]");
-    const addToCartImage = row.querySelector("[headers=header4] > img");
+  await Promise.all(
+    rows.map(async (row) => {
+      const articleCell = row.querySelector("[headers=header1]");
+      const addToCartImage = row.querySelector("[headers=header4] > img");
 
-    const match = /incluir\(\d*,event,'\d*','(\d*)'/.exec(
-      addToCartImage.onclick
-    );
+      const match = /incluir\(\d*,event,'\d*','(\d*)'/.exec(
+        addToCartImage.onclick
+      );
 
-    if (!match) {
-      return;
-    }
+      if (!match) {
+        return;
+      }
 
-    const articleId = match[1];
+      const articleId = match[1];
 
-    const image = document.createElement("img");
+      const articleData = await getArticleData(articleId);
+      const photoUrl = articleData?.photos?.[0]?.regular;
 
-    image.src = `https://raw.githubusercontent.com/ivancea/mercadona-images-extension/master/product-images/${articleId}.jpg`;
-    image.classList.add("articleImage");
-    image.onerror = () => {
-      image.style.display = "none";
-    };
+      if (photoUrl) {
+        const image = document.createElement("img");
 
-    articleCell.prepend(image);
+        image.src = photoUrl;
+        image.classList.add("articleImage");
+        image.onerror = () => {
+          image.style.display = "none";
+        };
+
+        articleCell.prepend(image);
+      }
+    })
+  );
+}
+
+async function getArticleData(articleId) {
+  return new Promise((resolve, reject) => {
+    GM_xmlhttpRequest({
+      method: "GET",
+      url: `https://tienda.mercadona.es/api/products/${articleId}/?lang=es&wh=mad1`,
+      onload: function (response) {
+        try {
+          resolve(JSON.parse(response.responseText));
+        } catch (error) {
+          reject(error);
+        }
+      },
+      onerror: function (error) {
+        reject(error);
+      },
+    });
   });
 }
