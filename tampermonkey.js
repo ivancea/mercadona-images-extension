@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Mercadona - Imágenes
+// @name         Mercadona - Images
 // @namespace    http://tampermonkey.net/
 // @version      2023-12-22
 // @description  Add images to old Mercadona catalog
