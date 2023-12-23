@@ -96,6 +96,14 @@ async function updateHtml(window, document) {
     rows.map(async (row) => await getArticleFromRow(row))
   );
 
+  const oldForm = document.getElementById("Tots");
+  oldForm.id = "OldTots";
+  oldForm.name = "OldTots";
+
+  const newForm = document.createElement("form");
+  newForm.id = "Tots";
+  newForm.name = "Tots";
+
   const container = document.createElement("div");
   container.classList.add("gridContainer");
 
@@ -103,7 +111,8 @@ async function updateHtml(window, document) {
     container.append(makeArticleElement(article));
   }
 
-  table.parentNode.append(container);
+  newForm.append(container);
+  table.parentNode.append(newForm);
   table.style.display = "none";
 }
 
