@@ -185,7 +185,9 @@ async function getArticleFromRow(row) {
 
   const articleId = match[1];
 
-  const articleData = await getArticleData(articleId);
+  const articleData = await getArticleData(articleId).catch((error) => {
+    console.warn(`Failed fetching article ${articleId} data `, error);
+  });
 
   return {
     id: articleId,
