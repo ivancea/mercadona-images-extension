@@ -11,6 +11,8 @@ It's a re-style of the page:
 - The table is changed to a grid
 - Each article now shows its image, taken from the new Mercadona website (Even if it doesn't work yet in your location)
 
+![New grid design](docs/images/new-grid-design.png)
+
 ## How to use
 
 _Note:_ For me, the old website doesn't work on Firefox, it won't let me log-in. This all was tested in Chrome.

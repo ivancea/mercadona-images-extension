@@ -11,6 +11,8 @@ Es un rediseño de la página:
 - La tabla se cambia por una cuadrícula
 - Cada artículo ahora muestra su imagen, tomada de la nueva web de Mercadona (Incluso aunque no funcione aún en tu localización)
 
+![Nuevo diseño de cuadrícula](docs/images/new-grid-design.png)
+
 ## Cómo usar
 
 _Nota:_ Para mí, la antigua web no funciona en Firefox; no me deja iniciar sesión. Todo esto ha sido probado en Chrome.
