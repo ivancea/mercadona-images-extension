@@ -4,7 +4,7 @@
 
 ## Descripción
 
-Script de Tampermonkey para mostrar imágenes en la [antigua web de Mercadona](https://www.telecompra.mercadona.es/).
+Extensión de Chrome para mostrar imágenes en la [antigua web de Mercadona](https://www.telecompra.mercadona.es/).
 
 Es un rediseño de la página:
 
@@ -15,6 +15,12 @@ Es un rediseño de la página:
 
 ## Cómo usar
 
+### Extensión de Chrome
+
+Descarga la extensión desde la Chrome Web Store.
+
+### Script de Tampermonkey
+
 _Nota:_ Para mí, la antigua web no funciona en Firefox; no me deja iniciar sesión. Todo esto ha sido probado en Chrome.
 
 1. Instala la extensión Tampermonkey en tu navegador. Descárgala aquí: <https://www.tampermonkey.net/>
@@ -22,7 +28,7 @@ _Nota:_ Para mí, la antigua web no funciona en Firefox; no me deja iniciar sesi
    <br/>![Abrir extensión](docs/images/open-extension.png)
 3. En el menú de la extensión, haz click en "Añadir nuevo script":
    <br/>![Añadir nuevo script](docs/images/add-new-script.png)
-4. Copia el código del archivo [tampermonkey.js](tampermonkey.js) y reemplaza el código que aparece en nuevo script con él
+4. Copia el código del archivo [script.js](script.js) y reemplaza el código que aparece en nuevo script con él
 5. Guarda con `CTRL+S` (Windows) o yendo a `Archivo > Guardar` en el menú:
    <br/>![Guardar script](docs/images/save-script.png)
 6. Ve a la web de Mercadona, o recárgala si ya estaba abierta. Prueba a buscar algún producto
@@ -33,6 +39,6 @@ _Nota:_ Puede tardar un poco (Menos de un segundo) en aparecer la nueva cuadríc
 
 ## Advertencia
 
-Este script no es oficial, y no está relacionado con Mercadona de ninguna manera.
+Esta extensión no es oficial, y no está relacionado con Mercadona de ninguna manera.
 
-Si en algún momento el script deja de funcionar, las imágenes dejan de cargarse, o la web te bloquea de alguna manera, por favor desactiva o elimina el script, y abre un ticket en este repositorio.
+Si en algún momento la extensión deja de funcionar, las imágenes dejan de cargarse, o la web te bloquea de alguna manera, por favor desactívala o elimínala y abre un ticket en este repositorio.

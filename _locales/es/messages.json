@@ -1,0 +1,10 @@
+{
+    "extName": {
+        "message": "Mercadona - Imágenes en web antigua",
+        "description": "Extension name"
+    },
+    "extDescription": {
+        "message": "Extensión para Mercadona que muestra la web antigua con imágenes y un mejor diseño.",
+        "description": "Extension description"
+    },
+}

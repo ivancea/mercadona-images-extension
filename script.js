@@ -94,8 +94,13 @@ async function updateHtml(window, document) {
   const rows = [...table.querySelectorAll("tbody tr")];
 
   const articles = await Promise.all(
-    rows.map(async (row) => await getArticleFromRow(row))
+    rows.map(async (row) => await getArticleFromRow(window, row))
   );
+
+  if (articles.some((article) => article === undefined)) {
+    console.warn("Failed to get all articles", articles);
+    return;
+  }
 
   const oldForm = document.getElementById("Tots");
   oldForm.id = "OldTots";
@@ -165,30 +170,25 @@ function makeArticleElement(article) {
   return articleContainer;
 }
 
-async function getArticleFromRow(row) {
+async function getArticleFromRow(window, row) {
   const articleName = row.querySelector(
     "[headers=header1] > span"
   )?.textContent;
-  const [detailsHeader, priceHeaders] =
+  const [detailsHeader, priceHeader] =
     row.querySelectorAll("[headers=header2]");
   const articleDetailsHref = detailsHeader.querySelector("span > a")?.href;
-  const articlePrices = [...priceHeaders.querySelectorAll("span")].map(
-    (span) => span.textContent
-  );
+  const articlePriceSpans = [...priceHeader.querySelectorAll("span")];
+  const articlePrices = articlePriceSpans.map((span) => span.textContent);
   const articleQuantitySelectorElements = row.querySelectorAll(
     "[headers=header3] > *"
   );
   const articleAddToCartButton = row.querySelector("[headers=header4] > img");
 
-  const match = /incluir\(\d*,event,'\d*','(\d*)'/.exec(
-    articleAddToCartButton.onclick
-  );
+  const articleIdsByLineNumber = loadArticleIdsByLineNumber(window);
 
-  if (!match) {
-    return undefined;
-  }
+  const lineNumber = articlePriceSpans[0].id.replace("txtPrecio", "");
 
-  const articleId = match[1];
+  const articleId = articleIdsByLineNumber[lineNumber];
 
   const articleDataPromise = getArticleData(articleId).catch((error) => {
     console.warn(`Failed fetching article ${articleId} data `, error);
@@ -205,8 +205,34 @@ async function getArticleFromRow(row) {
   };
 }
 
+function loadArticleIdsByLineNumber(window) {
+  const scripts = [...window.document.querySelectorAll("script")].map(
+    (s) => s.textContent
+  );
+
+  let currentLineNumber = 1;
+  const articleIdsByLineNumber = {};
+
+  for (const script of scripts) {
+    const regex = /InsertaLinea\((\d+),/g;
+    let match;
+    while ((match = regex.exec(script))) {
+      articleIdsByLineNumber[currentLineNumber] = match[1];
+      currentLineNumber++;
+    }
+  }
+
+  return articleIdsByLineNumber;
+}
+
 async function getArticleData(articleId) {
   const url = `https://tienda.mercadona.es/api/products/${articleId}/?lang=es&wh=mad1`;
+
+  if (typeof GM_xmlhttpRequest === "undefined") {
+    const corsUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+
+    return fetch(corsUrl).then((response) => response.json());
+  }
 
   return new Promise((resolve, reject) => {
     GM_xmlhttpRequest({
