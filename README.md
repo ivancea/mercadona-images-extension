@@ -17,7 +17,7 @@ It's a re-style of the page:
 
 ### Chrome extension
 
-Download the extension from the Chrome Web Store.
+Download the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/mercadona-im%C3%A1genes-en-web/hkkihmggglofjopfgmgkbiinekfghajh).
 
 ### Tampermonkey script
 

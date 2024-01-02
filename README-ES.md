@@ -17,7 +17,7 @@ Es un rediseño de la página:
 
 ### Extensión de Chrome
 
-Descarga la extensión desde la Chrome Web Store.
+Descarga la extensión desde la [Chrome Web Store](https://chromewebstore.google.com/detail/mercadona-im%C3%A1genes-en-web/hkkihmggglofjopfgmgkbiinekfghajh).
 
 ### Script de Tampermonkey
 
