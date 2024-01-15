@@ -66,7 +66,8 @@ async function updateHtml(window, document) {
     }
 
     .gridContainer > .articleContainer > div {
-      text-align: center
+      text-align: center;
+      word-break: break-word;
     }
 
     .gridContainer > .articleContainer > .imageContainer {
